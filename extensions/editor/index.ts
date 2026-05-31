@@ -112,6 +112,7 @@ class Editor extends CustomEditor {
 
 		return new SplitLine(left, right, {
 			padding: 1,
+			innerPadding: 1,
 			spacingChar: this.borderColor("─"),
 			ellipsis: theme.fg("dim", "…"),
 		}).render(width)[0];
