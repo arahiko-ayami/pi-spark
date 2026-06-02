@@ -19,15 +19,17 @@ export class PresetManager {
   }
 
   isActive(ctx: ExtensionContext, key: string): boolean {
-    return key === this.getActive(ctx);
+    const current = this.getCurrentPreset(ctx);
+    return key === this.findKey(current);
   }
 
   sync(ctx: ExtensionContext): void {
-    const active = this.getActive(ctx);
-    if (active === this.active) return;
+    const current = this.getCurrentPreset(ctx);
+    const currentKey = this.findKey(current);
+    if (currentKey === this.active) return;
 
-    this.active = active;
-    this.pi.events.emit(PRESET_CHANGE, active);
+    this.active = currentKey;
+    this.pi.events.emit(PRESET_CHANGE, this.active);
   }
 
   async apply(key: string, ctx: ExtensionContext): Promise<boolean> {
@@ -51,11 +53,14 @@ export class PresetManager {
 
     this.pi.setThinkingLevel(preset.thinkingLevel);
 
-    const active = this.getActive(ctx);
-    this.active = active;
-    this.pi.events.emit(PRESET_CHANGE, active);
+    this.active = this.findKey({
+      provider: model.provider,
+      model: model.id,
+      thinkingLevel: this.pi.getThinkingLevel(),
+    });
+    this.pi.events.emit(PRESET_CHANGE, this.active);
 
-    if (active === key) {
+    if (this.active === key) {
       ctx.ui.notify(`Preset: ${key} (${this.describe(key)})`, "info");
     } else {
       ctx.ui.notify(`Preset ${key}: thinking level ${preset.thinkingLevel} was clamped to ${this.pi.getThinkingLevel()}`, "warning");
@@ -70,7 +75,8 @@ export class PresetManager {
       return;
     }
 
-    const currentKey = this.getActive(ctx);
+    const current = this.getCurrentPreset(ctx);
+    const currentKey = this.findKey(current);
     const currentIndex = currentKey ? this.keys.indexOf(currentKey) : -1;
     const step = direction === "forward" ? 1 : -1;
     const nextIndex = currentIndex === -1 ? direction === "forward" ? 0 : this.keys.length - 1 : (currentIndex + step + this.keys.length) % this.keys.length;
@@ -85,15 +91,13 @@ export class PresetManager {
     return preset ? formatModel(preset.provider, preset.model, preset.thinkingLevel) : "";
   }
 
-  private getActive(ctx: ExtensionContext): string | undefined {
-    const current = this.getCurrentPreset(ctx);
-    if (!current) return undefined;
+  private findKey(preset: PresetConfig | undefined): string | undefined {
+    if (!preset) return;
 
     return this.keys.find((key) => {
-      const preset = this.presets[key];
-      if (!preset) return false;
+      const p = this.presets[key]!;
 
-      return preset.provider === current.provider && preset.model === current.model && preset.thinkingLevel === current.thinkingLevel;
+      return p.provider === preset.provider && p.model === preset.model && p.thinkingLevel === preset.thinkingLevel;
     });
   }
 
