@@ -6,6 +6,7 @@ A curated package of [pi](https://pi.dev/) extensions.
 
 - **Editor**: replaces the default editor with a compact working indicator and current model info.
 - **Footer**: shows the session info, cost, and context usage in one line, followed by extension statuses.
+- **Presets**: switches named model presets with `/preset` and quick cycle shortcuts.
 - **Recap**: generates a short idle-session recap and exposes a `/recap` command for manual generation, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
 
 ![Screenshot](./assets/screenshot.png)
@@ -30,6 +31,18 @@ Example:
     "spinner": "dots"
   },
   "footer": false,
+  "presets": {
+    "gpt": {
+      "provider": "openai-codex",
+      "model": "gpt-5.5",
+      "thinkingLevel": "medium"
+    },
+    "claude-opus": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-8",
+      "thinkingLevel": "high"
+    }
+  },
   "recap": {
     "idle": 180000,
     "provider": "openai-codex",
@@ -43,4 +56,6 @@ Notes:
 
 - Set an extension key to `false` to disable it.
 - The `editor.spinner` value can be `lights` or `dots`.
+- Presets can be selected with `/preset` or `/preset <key>`.
+- Cycle presets with `ctrl+super+p` and `ctrl+shift+super+p` (`super` is `command` on macOS).
 - The `recap.idle` value is in milliseconds and must be at least `5000`.

@@ -1,19 +1,10 @@
 import { clampThinkingLevel } from "@earendil-works/pi-ai";
-import * as z from "zod";
 
 import type { Api, Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { OptionalModelConfig } from "../shared/config/model";
 
-const THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh"] as const satisfies readonly ModelThinkingLevel[];
 const DEFAULT_THINKING_LEVEL: ModelThinkingLevel = "off";
-
-export const modelSchema = z.object({
-  provider: z.string().optional(),
-  model: z.string().optional(),
-  thinkingLevel: z.enum(THINKING_LEVELS).optional(),
-});
-
-type ModelConfig = z.infer<typeof modelSchema>;
 
 type RecapModel = {
   model: Model<Api>;
@@ -21,7 +12,7 @@ type RecapModel = {
   warning: string | undefined;
 };
 
-export async function resolveRecapModel(pi: ExtensionAPI, ctx: ExtensionContext, config: ModelConfig): Promise<RecapModel | undefined> {
+export async function resolveRecapModel(pi: ExtensionAPI, ctx: ExtensionContext, config: OptionalModelConfig): Promise<RecapModel | undefined> {
   const fallbackModel = ctx.model;
   if (!fallbackModel) {
     ctx.ui.notify("No model selected for recap", "warning");

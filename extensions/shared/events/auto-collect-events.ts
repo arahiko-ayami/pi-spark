@@ -1,6 +1,6 @@
 import type { ExtensionAPI, EventBus } from "@earendil-works/pi-coding-agent";
 
-export class EventCollector {
+class EventCollector {
   private pi: ExtensionAPI;
   private collected: Set<() => void> = new Set();
 

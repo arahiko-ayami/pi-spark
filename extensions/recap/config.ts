@@ -1,9 +1,9 @@
 import * as z from "zod";
 
 import { idleTimeoutSchema } from "./idle";
-import { modelSchema } from "./model";
+import { optionalModelSchema } from "../shared/config/model";
 
-export const recapConfigSchema = modelSchema.extend({
+export const recapConfigSchema = optionalModelSchema.extend({
   idle: idleTimeoutSchema.optional(),
 });
 
