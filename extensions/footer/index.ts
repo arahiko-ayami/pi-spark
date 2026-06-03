@@ -1,5 +1,4 @@
 import { isAbsolute, relative, resolve, sep } from "node:path";
-import { truncateToWidth } from "@earendil-works/pi-tui";
 
 import { SplitLine } from "../shared/components/split-line";
 import { loadConfig } from "../shared/config";
@@ -25,16 +24,10 @@ class FooterComponent implements Component {
   }
 
   render(width: number): string[] {
-    return [this.renderMainLine(width), this.renderStatusLine(width)].filter(Boolean);
-  }
-
-  private renderMainLine(width: number): string {
     const left = this.getLeft();
     const right = this.getRight();
-    return new SplitLine(left, right, {
-      primarySide: "right",
-      ellipsis: this.theme.fg("dim", "…"),
-    }).render(width)[0];
+
+    return new SplitLine(left, right, { primarySide: "right", ellipsis: this.theme.fg("dim", "…") }).render(width);
   }
 
   private getLeft(): string {
@@ -50,10 +43,22 @@ class FooterComponent implements Component {
   }
 
   private getRight(): string {
+    const statusesText = this.getStatusesText();
     const styledCostText = this.getStyledCostText();
     const styledContextUsageText = this.getStyledContextUsageText();
 
-    return `${styledCostText}${this.theme.fg("dim", " • ")}${styledContextUsageText}`;
+    return [statusesText, styledCostText, styledContextUsageText].filter(Boolean).join(this.theme.fg("dim", " • "));
+  }
+
+  /** Get extension statuses, sorted by key alphabetically. */
+  private getStatusesText(): string {
+    const extensionStatuses = this.footerData.getExtensionStatuses();
+    if (extensionStatuses.size === 0) return "";
+
+    return Array.from(extensionStatuses.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, text]) => sanitizeText(text))
+      .join(this.theme.fg("dim", " • "));
   }
 
   private getStyledCostText(): string {
@@ -64,8 +69,8 @@ class FooterComponent implements Component {
     }, { subscription: 0, paid: 0 });
 
     const isSubscription = this.ctx.model ? this.ctx.modelRegistry.isUsingOAuth(this.ctx.model) : false;
-    const subscriptionCostText = isSubscription || cost.subscription > 0 ? formatCost(cost.subscription, true) : undefined;
-    const paidCostText = !isSubscription || cost.paid > 0 ? formatCost(cost.paid, false) : undefined;
+    const subscriptionCostText = isSubscription || cost.subscription >= 0.005 ? formatCost(cost.subscription, true) : undefined;
+    const paidCostText = !isSubscription || cost.paid >= 0.005 ? formatCost(cost.paid, false) : undefined;
     const costText = [subscriptionCostText, paidCostText].filter(Boolean).join(" + ");
 
     const totalCost = cost.subscription + cost.paid;
@@ -82,19 +87,6 @@ class FooterComponent implements Component {
     if (percent && percent > 90) return this.theme.fg("error", contextUsageText);
     if (percent && percent > 70) return this.theme.fg("warning", contextUsageText);
     return this.theme.fg("dim", contextUsageText);
-  }
-
-  /** Add extension statues on a single line, sorted by key alphabetically. */
-  private renderStatusLine(width: number): string {
-    const extensionStatuses = this.footerData.getExtensionStatuses();
-    if (extensionStatuses.size === 0) return "";
-
-    const statusLine = Array.from(extensionStatuses.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, text]) => sanitizeText(text))
-      .join(this.theme.fg("dim", " • "));
-
-    return truncateToWidth(statusLine, width, this.theme.fg("dim", "..."));
   }
 }
 
