@@ -10,14 +10,15 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import type { RecapConfig } from "./config";
 
 const SYSTEM_PROMPT = [
-  "You write concise recaps for an idle terminal coding agent session.",
-  "Summarize only what is supported by the transcript; do not invent progress, intent, files, or next steps.",
-  "Focus on the user's goal, completed work, current state, and likely next step.",
-  "Prefer recent context when the session changed direction.",
-  "Output one short paragraph of 1-2 sentences. No heading, markdown, bullets, or quotes.",
+  "You write concise idle-session recaps for a terminal coding agent.",
+  "Use only transcript-supported facts; do not invent progress, intent, files, or next steps.",
+  "Prefer the latest active task if the session changed direction.",
+  "Summarize the user's goal, what was done, current state, and any clearly supported next step.",
+  "Respond in the conversation's primary language.",
+  "Output 1-2 plain-text sentences under 80 words. No heading, markdown, bullets, or quotes.",
 ].join("\n");
 
-const MAX_TOKENS = 120;
+const MAX_TOKENS = 100;
 const MAX_CONVERSATION_CHARS = 8_000;
 
 export class RecapManager {
@@ -111,8 +112,8 @@ export class RecapManager {
     const conversation = text.length > MAX_CONVERSATION_CHARS ? text.slice(-MAX_CONVERSATION_CHARS) : text;
 
     return [
-      "Create a short recap of this coding agent session for the user to see while the agent is idle.",
-      "The transcript may be truncated from the beginning and may start mid-message; account for that uncertainty.",
+      "Create a short recap from this transcript, ordered oldest to newest.",
+      "It may be truncated from the beginning; focus on the latest coherent task.",
       "",
       "<conversation>",
       conversation,
