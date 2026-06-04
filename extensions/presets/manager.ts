@@ -35,7 +35,7 @@ export class PresetManager {
   async apply(key: string, ctx: ExtensionContext): Promise<boolean> {
     const preset = this.presets[key];
     if (!preset) {
-      ctx.ui.notify(`Unknown preset ${key}`, "error");
+      ctx.ui.notify(`Unknown preset ${key} (${this.keys.length ? `available: ${this.keys.join(", ")}` : "none defined"})`, "error");
       return false;
     }
 

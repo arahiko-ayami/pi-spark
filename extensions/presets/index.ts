@@ -9,9 +9,19 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 export default function (pi: ExtensionAPI) {
   let presetManager: PresetManager | undefined = undefined;
 
-  pi.on("session_start", (_event, ctx) => {
+  pi.registerFlag("preset", {
+    description: "Model preset to use",
+    type: "string",
+  });
+
+  pi.on("session_start", async (event, ctx) => {
+    const presetFlag = pi.getFlag("preset");
+
     const config = loadConfig(ctx, "presets");
-    if (!config || Object.keys(config).length === 0) return;
+    if (!config || Object.keys(config).length === 0) {
+      if (presetFlag) ctx.ui.notify("No presets defined in spark.json", "warning");
+      return;
+    }
 
     presetManager = new PresetManager(pi, config);
     presetManager.sync(ctx);
@@ -42,6 +52,10 @@ export default function (pi: ExtensionAPI) {
         }
       },
     });
+
+    if (presetFlag && typeof presetFlag === "string") {
+      await presetManager.apply(presetFlag, ctx);
+    }
   });
 
   pi.on("model_select", (_event, ctx) => {
