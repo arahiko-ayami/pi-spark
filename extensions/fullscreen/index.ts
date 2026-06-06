@@ -4,7 +4,7 @@ import { BottomFiller } from "./filler";
 import { loadConfig } from "../shared/config";
 import { sanitizeText } from "../shared/format";
 
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, Theme } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth } from "@earendil-works/pi-tui";
 
 import type { TUI } from "@earendil-works/pi-tui";
@@ -12,15 +12,15 @@ import type { UserMessage } from "@earendil-works/pi-ai";
 
 const WIDGET_KEY = "fullscreen";
 
-function getSessionDisplayName(ctx: ExtensionContext): string | undefined {
+function getSessionDisplayText(ctx: ExtensionContext, theme: Theme): string | undefined {
   const sessionName = ctx.sessionManager.getSessionName();
-  if (sessionName) return sessionName;
+  if (sessionName) return theme.fg("warning", sanitizeText(sessionName));
 
   for (const entry of ctx.sessionManager.getEntries()) {
     if (entry.type !== "message" || entry.message.role !== "user") continue;
 
     const text = extractText(entry.message);
-    if (text) return text;
+    if (text) return sanitizeText(text);
   }
 
   return undefined;
@@ -95,8 +95,8 @@ export default function (pi: ExtensionAPI) {
       // Leave one concise line after the cleared session.
       const theme = ctx.ui.theme;
       const exitMessage = `${theme.bold(theme.fg("accent", "pi"))} ${theme.fg("dim", `v${VERSION} exited`)}`;
-      const sessionName = getSessionDisplayName(ctx);
-      const line = truncateToWidth(`${exitMessage}${sessionName ? `${theme.fg("dim", ":")} ${sanitizeText(sessionName)}` : ""}`, tui.terminal.columns, "…");
+      const sessionText = getSessionDisplayText(ctx, theme);
+      const line = truncateToWidth(`${exitMessage}${sessionText ? `${theme.fg("dim", ":")} ${sessionText}` : ""}`, tui.terminal.columns, "…");
       tui.terminal.write(`${line}\r\n`);
     }
 
