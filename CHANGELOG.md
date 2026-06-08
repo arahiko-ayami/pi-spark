@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/zlliang/pi-spark/compare/v0.3.0...v0.3.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* **fullscreen:** keep clearOnShrink enabled across reload ([e1adde0](https://github.com/zlliang/pi-spark/commit/e1adde0eca052319dd9231f6e22456ae33109289))
+
 ## [0.3.0](https://github.com/zlliang/pi-spark/compare/v0.2.1...v0.3.0) (2026-06-06)
 
 
