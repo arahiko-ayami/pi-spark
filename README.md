@@ -71,7 +71,7 @@ Example:
 
 ### Editor
 
-- `editor.spinner` controls the working indicator style and can be `dots`, `lights`, or `tildes`.
+- `editor.spinner` controls the working indicator style and can be `dots`, `lights`, `tildes`, or `pulse`.
 
 ### Footer
 

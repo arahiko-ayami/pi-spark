@@ -2,7 +2,7 @@ import * as z from "zod";
 
 import type { TUI } from "@earendil-works/pi-tui";
 
-export const spinnerPresetSchema = z.enum(["dots", "lights", "tildes"]);
+export const spinnerPresetSchema = z.enum(["dots", "lights", "tildes", "pulse"]);
 
 type SpinnerPreset = z.infer<typeof spinnerPresetSchema>;
 
@@ -26,6 +26,11 @@ const SPINNER_PRESETS: Record<SpinnerPreset, SpinnerParams> = {
   tildes: {
     frames: ["∼", "≈", "≋", "≈", "∼"],
     interval: 200,
+    random: false,
+  },
+  pulse: {
+    frames: ["·", "•", "●", "•"],
+    interval: 120,
     random: false,
   },
 };
