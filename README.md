@@ -10,9 +10,9 @@ A small, opinionated collection of [pi](https://pi.dev/) extensions.
 - **Editor:** replaces the default editor with a compact working indicator (inspired by [Amp](https://ampcode.com/)) and current model info.
 - **Footer:** shows session information, extension statuses, cost, and context usage on one line.
 - **Fullscreen:** clears the screen and scrollback on session start, pins the editor and footer to the bottom for a full-screen session, and clears again on exit.
+- **Name:** exposes a `name` tool so the agent can give the current session a concise, recognizable name in the session selector.
 - **Presets:** switches named model presets with `/preset`, `--preset`, and quick cycle shortcuts.
 - **Recap:** generates a short idle-session recap and exposes a `/recap` command for manual generation, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
-- **Set session name:** exposes a `set_session_name` tool so the agent can give the current session a concise, recognizable name in the session selector.
 - **Trust all:** bypasses pi's project trust dialog, added in 0.79.0, and removes saved trust decisions so startup stays minimal.
 
 ![Screenshot](./assets/screenshot.png)
@@ -82,6 +82,10 @@ Example:
 
 - pi-spark clears the screen and scrollback at session start and exit, pins the editor and footer to the bottom, and enables pi's `clearOnShrink` behavior programmatically so pinned UI stays aligned after taller components close.
 
+### Name
+
+- The agent can set or refresh the current session's name and optionally give a reason.
+
 ### Presets
 
 - Each key under `presets` defines a named model preset with `provider`, `model`, and optional `thinkingLevel` fields.
@@ -96,10 +100,6 @@ Use presets in these ways:
 
 - pi-spark can generate a short recap after the session has been idle or when you run `/recap` manually.
 - The `recap.idle` value is in milliseconds and must be at least `5000`. The recap model can be customized with `provider`, `model`, and `thinkingLevel`.
-
-### Set session name
-
-- The agent can set or refresh the current session's display name and optionally give a reason.
 
 ### Trust all
 

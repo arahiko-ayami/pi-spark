@@ -4,18 +4,18 @@ import { codexUsageConfigSchema } from "../../codex-usage/config";
 import { editorConfigSchema } from "../../editor/config";
 import { footerConfigSchema } from "../../footer/config";
 import { fullscreenConfigSchema } from "../../fullscreen/config";
+import { nameConfigSchema } from "../../name/config";
 import { presetsConfigSchema } from "../../presets/config";
 import { recapConfigSchema } from "../../recap/config";
-import { setSessionNameConfigSchema } from "../../set-session-name/config";
 
 export const configSchemas = {
   codexUsage: codexUsageConfigSchema,
   editor: editorConfigSchema,
   footer: footerConfigSchema,
   fullscreen: fullscreenConfigSchema,
+  name: nameConfigSchema,
   presets: presetsConfigSchema,
   recap: recapConfigSchema,
-  setSessionName: setSessionNameConfigSchema,
 };
 
 export type ConfigField = keyof typeof configSchemas;

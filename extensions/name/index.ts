@@ -10,29 +10,29 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
     if (!ctx.hasUI) return;
 
-    const config = loadConfig(ctx, "setSessionName");
+    const config = loadConfig(ctx, "name");
     if (!config) return;
 
     pi.registerTool({
-      name: "set_session_name",
-      label: "set session name",
+      name: "name",
+      label: "name",
       description:
-        "Set or refresh the current session's display name, shown in the session selector " +
+        "Set or refresh the current session's concise name, shown in the session selector " +
         "instead of the first-message preview. Use this when a concise name would make the " +
         "session easier to recognize later, such as after a long opening prompt or a substantial " +
         "topic shift.",
-      promptSnippet: "Set or refresh the current session's concise display name",
+      promptSnippet: "Set or refresh the current session's concise name",
       promptGuidelines: [
-        "Use set_session_name when the session would benefit from a concise, recognizable name, especially after a long, vague, or pasted opening prompt.",
-        "Use set_session_name to refresh the name only after a substantial shift in the conversation's focus; do not rename for minor follow-ups.",
-        "Include a concise set_session_name reason when it would help explain why the name identifies the session.",
+        "Use name when the session would benefit from a concise, recognizable name, especially after a long, vague, or pasted opening prompt.",
+        "Use name to refresh the session's name only after a substantial shift in the conversation's focus; do not rename for minor follow-ups.",
+        "Include a concise reason for name when it would help explain why the name identifies the session.",
       ],
       parameters: Type.Object({
         name: Type.String({
           minLength: 1,
           maxLength: 120,
           description:
-            "Concise session display name. Use a short, recognizable phrase in sentence case, " +
+            "Concise session name. Use a short, recognizable phrase in sentence case, " +
             "ideally <= 72 characters. Do not use surrounding quotes, trailing punctuation, or " +
             "generic prefixes like \"Chat about\". Examples: \"Refactor auth module\", " +
             "\"Debug flaky CI pipeline\", \"Draft Q3 planning doc\".",
@@ -53,7 +53,7 @@ export default function (pi: ExtensionAPI) {
         const reason = sanitizeText(args.reason ?? "");
 
         const container = new Container();
-        container.addChild(new Text(`${theme.bold(theme.fg("toolTitle", "set_session_name"))} ${theme.fg("accent", name)}`, 0, 0));
+        container.addChild(new Text(`${theme.bold(theme.fg("toolTitle", "name"))} ${theme.fg("accent", name)}`, 0, 0));
 
         if (reason) {
           container.addChild(new Spacer(1));
