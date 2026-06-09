@@ -102,7 +102,7 @@ export default function (pi: ExtensionAPI) {
 
       events.on(PRESET_CHANGE, (data) => {
         const payload = parsePresetChange(data);
-        editor?.setSlot("modelBefore", payload ? `preset:${payload}` : undefined);
+        editor?.setSlot("modelBefore", payload ? ctx.ui.theme.bold(payload) : undefined);
       });
 
       return editor;
