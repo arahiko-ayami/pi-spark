@@ -6,7 +6,6 @@ A small, opinionated collection of [pi](https://pi.dev/) extensions.
 
 ## Extensions
 
-- **Credits:** shows the active provider's credit balance or rate-limit usage as a footer status.
 - **Editor:** replaces the default editor with a compact working indicator (inspired by [Amp](https://ampcode.com/)) and current model info.
 - **Footer:** shows session information, extension statuses, cost, and context usage on one line.
 - **Fullscreen:** clears the screen and scrollback on session start, pins the editor and footer to the bottom for a full-screen session, and clears again on exit.
@@ -65,11 +64,6 @@ Example:
 }
 ```
 
-### Credits
-
-- pi-spark shows the active model provider's credits as a footer status. The status appears only while a supported provider is active and uses that provider's stored credential or API key.
-- Supported providers: OpenAI Codex, OpenRouter, and Vercel AI Gateway.
-
 ### Editor
 
 - `editor.spinner` controls the working indicator style and can be `dots`, `lights`, `tildes`, or `pulse`.
@@ -113,3 +107,7 @@ Use presets in these ways:
 ```
 
 Project trust is an [input-loading guard](https://pi.dev/docs/latest/security#project-trust), so use `"always"` only if you trust the projects you open.
+
+## Other pi packages
+
+- [pi-credits](https://github.com/zlliang/pi-credits): shows the active provider's credit balance or rate-limit usage as a footer status.

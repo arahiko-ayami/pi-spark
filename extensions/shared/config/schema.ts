@@ -1,6 +1,5 @@
 import * as z from "zod";
 
-import { creditsConfigSchema } from "../../credits/config";
 import { editorConfigSchema } from "../../editor/config";
 import { footerConfigSchema } from "../../footer/config";
 import { fullscreenConfigSchema } from "../../fullscreen/config";
@@ -9,7 +8,6 @@ import { presetsConfigSchema } from "../../presets/config";
 import { recapConfigSchema } from "../../recap/config";
 
 export const configSchemas = {
-  credits: creditsConfigSchema,
   editor: editorConfigSchema,
   footer: footerConfigSchema,
   fullscreen: fullscreenConfigSchema,
