@@ -15,19 +15,21 @@ const DEFAULT_THINKING_LEVEL: ModelThinkingLevel = "medium";
 type ModelMetadata = Omit<Model<Api>, "headers" | "compat"> & {
   thinkingLevels: ModelThinkingLevel[];
   defaultThinkingLevel: ModelThinkingLevel;
+  available: boolean;
 };
 
 type ModelToolDetails =
   | { action: "current"; current: { model: ModelMetadata; thinkingLevel: ModelThinkingLevel } }
   | { action: "list"; models: ModelMetadata[]; total: number; truncation?: TruncationResult }
 
-function toMetadata(model: Model<Api>): ModelMetadata {
+function toMetadata(model: Model<Api>, available: boolean): ModelMetadata {
   const { headers: _headers, compat: _compat, ...metadata } = model;
 
   return {
     ...metadata,
     thinkingLevels: getSupportedThinkingLevels(model),
     defaultThinkingLevel: clampThinkingLevel(model, DEFAULT_THINKING_LEVEL),
+    available,
   };
 }
 
@@ -41,22 +43,26 @@ export default function (pi: ExtensionAPI) {
       label: "model",
       description:
         "Inspect pi's model state. The \"current\" action returns the active model with metadata " +
-        "and thinking level. The \"list\" action returns all models the user can use " +
-        "currently (auth configured), including metadata such as provider, id, name, API type, " +
-        "reasoning support, input modalities, cost, context window, and max output tokens. " +
-        "Lists can be filtered with provider/model queries and paged with offset/limit. " +
-        `List output is one JSON object per line, truncated to ${DEFAULT_MAX_LINES} models or ` +
-        `${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first).`,
-      promptSnippet: "List available models or show the current model in use",
+        "and thinking level. The \"list\" action returns models with metadata such as provider, " +
+        "id, name, API type, reasoning support, input modalities, cost, context window, and max " +
+        "output tokens. Lists can be filtered with scope/provider/model queries and paged with " +
+        `offset/limit. List output is one JSON object per line, truncated to ${DEFAULT_MAX_LINES} ` +
+        `models or ${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first).`,
+      promptSnippet: "List models or show the current model in use",
       promptGuidelines: [
-        "Use model when you need to know available pi models, the active provider or model, or the current thinking level.",
+        "Use model when you need to know pi models, the active provider or model, or the current thinking level.",
       ],
       parameters: Type.Object({
         action: StringEnum(["list", "current"] as const, {
           description:
             "\"current\" returns the active model with metadata and thinking level; " +
-            "\"list\" returns all currently usable models with metadata.",
+            "\"list\" returns models with metadata.",
         }),
+        scope: Type.Optional(StringEnum(["all", "available"] as const, {
+          description:
+            "For list: \"all\" lists every pi model; \"available\" (default) lists only " +
+            "models with auth configured.",
+        })),
         provider: Type.Optional(Type.String({
           description: "For list: filter by provider, case-insensitive substring (e.g., \"vercel\", \"moonshot\")",
         })),
@@ -73,10 +79,11 @@ export default function (pi: ExtensionAPI) {
       renderCall(args, theme) {
         let text = `${theme.bold(theme.fg("toolTitle", "model"))} ${theme.fg("accent", args.action)}`;
 
+        if (args.action === "list") text += theme.fg("muted", ` ${args.scope ?? "available"}`);
         if (args.provider) text += theme.fg("muted", ` provider:${args.provider}`);
         if (args.model) text += theme.fg("muted", ` model:${args.model}`);
-        if (args.offset !== undefined || args.limit !== undefined) text += theme.fg("warning", ` from:${args.offset ?? 1}`);
-        if (args.limit !== undefined) text += theme.fg("warning", ` to:${(args.offset ?? 1) + args.limit - 1}`);
+        if (args.offset !== undefined || args.limit !== undefined) text += theme.fg("warning", ` from ${args.offset ?? 1}`);
+        if (args.limit !== undefined) text += theme.fg("warning", ` to ${(args.offset ?? 1) + args.limit - 1}`);
 
         return new Text(text, 0, 0);
       },
@@ -109,13 +116,14 @@ export default function (pi: ExtensionAPI) {
 
         if (models.length > 0 && expanded) {
           models.forEach((model) => {
-            container.addChild(new Text(theme.fg("muted", formatModel(model.provider, model.id)), 0, 0));
+            const label = formatModel(model.provider, model.id);
+            container.addChild(new Text(theme.fg(model.available ? "muted" : "dim", label), 0, 0));
           });
 
           container.addChild(new Spacer(1));
         }
 
-        const summary = total > 0 ? `${models.length !== total ? `${models.length} of ` : ""}${total} ${filtered ? "matched" : "available"} model${total === 1 ? "" : "s"} listed` : `0 models ${filtered ? "matched" : "available"}`;
+        const summary = total > 0 ? `${models.length !== total ? `${models.length} of ` : ""}${total} ${filtered ? "matched " : ""}model${total === 1 ? "" : "s"} listed` : `0 models${filtered ? " matched" : ""}`;
         const truncatedHint = details.truncation?.truncated ? theme.fg("warning", " (truncated)") : "";
         const expandHint = models.length > 0 && !expanded ? theme.fg("dim", ` (${keyText("app.tools.expand")} to expand)`) : "";
         container.addChild(new Text(theme.fg("muted", summary) + truncatedHint + expandHint, 0, 0));
@@ -128,7 +136,7 @@ export default function (pi: ExtensionAPI) {
           if (!model) throw new Error("No model is currently selected");
 
           const thinkingLevel = pi.getThinkingLevel();
-          const current = { model: toMetadata(model), thinkingLevel };
+          const current = { model: toMetadata(model, true), thinkingLevel };
 
           return {
             content: [{ type: "text", text: JSON.stringify(current) }],
@@ -140,16 +148,19 @@ export default function (pi: ExtensionAPI) {
         const modelQuery = params.model?.trim().toLowerCase();
         const filtered = providerQuery !== undefined || modelQuery !== undefined;
 
-        const matched = ctx.modelRegistry.getAvailable().filter((model) => {
+        const scope = params.scope ?? "available";
+        const source = scope === "all" ? ctx.modelRegistry.getAll() : ctx.modelRegistry.getAvailable();
+
+        const matched = source.filter((model) => {
           if (providerQuery && !model.provider.toLowerCase().includes(providerQuery)) return false;
           if (modelQuery && !model.id.toLowerCase().includes(modelQuery) && !model.name.toLowerCase().includes(modelQuery)) return false;
           return true;
-        }).map(toMetadata);
+        }).map((model) => toMetadata(model, scope === "all" ? ctx.modelRegistry.hasConfiguredAuth(model) : true));
         const total = matched.length;
 
         if (total === 0) {
           return {
-            content: [{ type: "text", text: `0 models ${filtered ? "matched" : "available"}` }],
+            content: [{ type: "text", text: `0 models${filtered ? " matched" : ""}` }],
             details: { action: "list", models: [], total } satisfies ModelToolDetails,
           };
         }

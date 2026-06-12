@@ -18,9 +18,7 @@ export default function (pi: ExtensionAPI) {
       label: "name",
       description:
         "Set or refresh the current session's concise name, shown in the session selector " +
-        "instead of the first-message preview. Use this when a concise name would make the " +
-        "session easier to recognize later, such as after a long opening prompt or a substantial " +
-        "topic shift.",
+        "instead of the first-message preview.",
       promptSnippet: "Set or refresh the current session's concise name",
       promptGuidelines: [
         "Use name when the session would benefit from a concise, recognizable name, especially after a long, vague, or pasted opening prompt.",

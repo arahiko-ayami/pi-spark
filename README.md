@@ -80,7 +80,7 @@ Example:
 ### Models
 
 - The agent can call the `model` tool with two actions:
-  - `list`: gets all currently usable models with their metadata, with optional `provider` and `model` substring filters and `offset`/`limit` paging.
+  - `list`: lists models with their metadata, with optional `scope`, `provider` and `model` substring filters, and `offset`/`limit` paging.
   - `current`: gets the active provider, model, and thinking level.
 
 ### Name
