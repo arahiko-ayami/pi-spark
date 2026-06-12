@@ -70,15 +70,13 @@ export default function (pi: ExtensionAPI) {
           description: "For list: maximum number of models to return"
         })),
       }),
-      renderCall(args, theme, { expanded }) {
+      renderCall(args, theme) {
         let text = `${theme.bold(theme.fg("toolTitle", "model"))} ${theme.fg("accent", args.action)}`;
 
         if (args.provider) text += theme.fg("muted", ` provider:${args.provider}`);
         if (args.model) text += theme.fg("muted", ` model:${args.model}`);
         if (args.offset !== undefined || args.limit !== undefined) text += theme.fg("warning", ` from:${args.offset ?? 1}`);
         if (args.limit !== undefined) text += theme.fg("warning", ` to:${(args.offset ?? 1) + args.limit - 1}`);
-
-        if (!expanded) text += theme.fg("dim", ` (${keyText("app.tools.expand")} to expand)`);
 
         return new Text(text, 0, 0);
       },
@@ -109,7 +107,7 @@ export default function (pi: ExtensionAPI) {
         const models = details.models ?? [];
         const total = details.total ?? models.length;
 
-        if (expanded) {
+        if (models.length > 0 && expanded) {
           models.forEach((model) => {
             container.addChild(new Text(theme.fg("muted", formatModel(model.provider, model.id)), 0, 0));
           });
@@ -117,15 +115,17 @@ export default function (pi: ExtensionAPI) {
           container.addChild(new Spacer(1));
         }
 
-        const summary = `${models.length !== total ? `${models.length} of ` : ""}${total} ${filtered ? "matched" : "available"} model${total === 1 ? "" : "s"} listed`;
-        container.addChild(new Text(theme.fg("muted", summary) + (details.truncation?.truncated ? theme.fg("warning", " (truncated)") : ""), 0, 0));
+        const summary = total > 0 ? `${models.length !== total ? `${models.length} of ` : ""}${total} ${filtered ? "matched" : "available"} model${total === 1 ? "" : "s"} listed` : `0 models ${filtered ? "matched" : "available"}`;
+        const truncatedHint = details.truncation?.truncated ? theme.fg("warning", " (truncated)") : "";
+        const expandHint = models.length > 0 && !expanded ? theme.fg("dim", ` (${keyText("app.tools.expand")} to expand)`) : "";
+        container.addChild(new Text(theme.fg("muted", summary) + truncatedHint + expandHint, 0, 0));
 
         return container;
       },
       async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
         if (params.action === "current") {
           const model = ctx.model;
-          if (!model) throw new Error("No model is currently selected.");
+          if (!model) throw new Error("No model is currently selected");
 
           const thinkingLevel = pi.getThinkingLevel();
           const current = { model: toMetadata(model), thinkingLevel };
@@ -149,7 +149,7 @@ export default function (pi: ExtensionAPI) {
 
         if (total === 0) {
           return {
-            content: [{ type: "text", text: `0 models ${filtered ? "matched" : "available"}.` }],
+            content: [{ type: "text", text: `0 models ${filtered ? "matched" : "available"}` }],
             details: { action: "list", models: [], total } satisfies ModelToolDetails,
           };
         }
@@ -157,7 +157,7 @@ export default function (pi: ExtensionAPI) {
         // Convert from 1-indexed offset to 0-indexed array access.
         const startIndex = params.offset ? Math.max(0, params.offset - 1) : 0;
         if (startIndex >= total) {
-          throw new Error(`Offset ${params.offset} is beyond end of list (${total} models total).`);
+          throw new Error(`Offset ${params.offset} is beyond end of list (${total} models total)`);
         }
 
         const endIndex = params.limit !== undefined ? Math.min(startIndex + params.limit, total) : total;

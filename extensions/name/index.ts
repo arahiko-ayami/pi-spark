@@ -72,12 +72,12 @@ export default function (pi: ExtensionAPI) {
       },
       async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
         const name = sanitizeText(params.name);
-        if (!name) throw new Error("Session name was empty after normalization. Provide a short, non-empty phrase.");
+        if (!name) throw new Error("Session name was empty after normalization; provide a short, non-empty phrase");
 
         const previous = pi.getSessionName() ?? null;
         if (previous === name) {
           return {
-            content: [{ type: "text", text: `Session is already named "${name}". No change.` }],
+            content: [{ type: "text", text: `Session is already named "${name}"; no change` }],
             details: { changed: false, previous },
           };
         }
@@ -85,7 +85,7 @@ export default function (pi: ExtensionAPI) {
         pi.setSessionName(name);
 
         return {
-          content: [{ type: "text", text: `${previous ? `Renamed session from "${previous}" to "${name}".` : `Named session "${name}".`}` }],
+          content: [{ type: "text", text: `${previous ? `Renamed session from "${previous}" to "${name}"` : `Named session "${name}"`}` }],
           details: { changed: true, previous },
         };
       },
