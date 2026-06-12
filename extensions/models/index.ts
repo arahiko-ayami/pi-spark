@@ -54,8 +54,8 @@ export default function (pi: ExtensionAPI) {
       parameters: Type.Object({
         action: StringEnum(["list", "current"] as const, {
           description:
-            "\"list\" returns all currently usable models with metadata; " +
-            "\"current\" returns the active model with metadata and thinking level.",
+            "\"current\" returns the active model with metadata and thinking level; " +
+            "\"list\" returns all currently usable models with metadata.",
         }),
         provider: Type.Optional(Type.String({
           description: "For list: filter by provider, case-insensitive substring (e.g., \"vercel\", \"moonshot\")",
