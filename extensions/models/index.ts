@@ -49,7 +49,7 @@ export default function (pi: ExtensionAPI) {
         `${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first).`,
       promptSnippet: "List available models or show the current model in use",
       promptGuidelines: [
-        "Use model when the user asks which models are available in pi or which model and thinking level are currently in use.",
+        "Use model when you need to know available pi models, the active provider or model, or the current thinking level.",
       ],
       parameters: Type.Object({
         action: StringEnum(["list", "current"] as const, {
