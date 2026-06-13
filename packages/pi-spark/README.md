@@ -1,5 +1,3 @@
-![Cover](./assets/cover.png)
-
 # pi-spark
 
 A collection of [pi](https://pi.dev/) extensions that polish the daily pi experience.
@@ -117,4 +115,4 @@ Project trust is an [input-loading guard](https://pi.dev/docs/latest/security#pr
 
 ## Other pi packages
 
-- [pi-credits](https://github.com/zlliang/pi-packages/tree/main/packages/pi-credits): shows the active provider's credit balance or rate-limit usage as a footer status.
+See my [pi-packages](https://github.com/zlliang/pi-packages) repo for the full list.
