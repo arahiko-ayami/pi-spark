@@ -31,7 +31,7 @@ export const idleTimeoutSchema = z
 type IdleTimeout = z.infer<typeof idleTimeoutSchema>;
 type IdleHash = string | number | boolean;
 
-const DEFAULT_IDLE_MS = 3 * 60 * 1000;
+const DEFAULT_IDLE_MS = 5 * 60 * 1000;
 const POLL_MS = 1_000;
 
 export class IdleListener<T> {
