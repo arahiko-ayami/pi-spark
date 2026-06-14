@@ -4,44 +4,54 @@
 
 [Pi](https://pi.dev/) package that polishes your daily experience and keeps you at the frontier of agentic workflows.
 
-## Extensions
+## Features
 
-- **Credits:** shows the active provider's credit balance or rate-limit usage in the status line.
-- **Editor:** replaces the default editor with a compact working indicator (inspired by [Amp](https://ampcode.com/)) and current model info.
-- **Footer:** shows session information, extension statuses, cost, and context usage on one line.
-- **Fullscreen:** clears the screen and scrollback on session start, pins the editor and footer to the bottom for a full-screen session, and clears again on exit.
-- **Models:** exposes a `model` tool so the agent can list the models the user can use currently and inspect the provider, model, and thinking level in use.
-- **Name:** exposes a `name` tool so the agent can give the current session a concise, recognizable name in the session selector.
-- **Presets:** switches named model presets with `/preset`, `--preset`, and quick cycle shortcuts.
-- **Recap:** generates a short idle-session recap and exposes a `/recap` command for manual generation, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
+### Compact TUI: editor, footer, and fullscreen
 
-![Screenshot](./assets/screenshot.png)
+pi-spark ships with custom editor, footer, and fullscreen rendering, replacing the default ones. The compact TUI gives you a calm, immersive experience without distraction.
 
-## Install
+- The editor shows a working indicator inspired by [Amp](https://ampcode.com/) and the current model on the top border. If you use [presets](#presets), the active preset appears there too.
+- The footer shows session information, extension statuses, cost, and context usage on one line.
+- The fullscreen rendering clears the terminal screen and scrollback on session start and exit, and pins the editor and footer to the bottom.
 
-Install from npm:
+### Credits
 
-```bash
-pi install npm:pi-spark
-```
+pi-spark shows the active provider's credit balance or rate-limit usage in the status line, so you can keep an eye on what's left without leaving the terminal.
 
-For local development from this repo:
+- Supported providers: DeepSeek, Fireworks, Moonshot, OpenAI Codex, OpenRouter, and Vercel AI Gateway.
+- Most provider fetching follows [CodexBar](https://github.com/steipete/codexbar). Fireworks is the exception: its balance sits behind an internal gRPC API, reverse-engineered from the `firectl` binary (see [docs/fireworks.md](./docs/fireworks.md)).
 
-```bash
-pi install /path/to/pi-spark
-```
+### Presets
 
-## Configure
+pi-spark lets you define named model presets in `spark.json` (see [Configuration](#configuration)), so you can switch between models and thinking levels without retyping provider details. The active preset is shown on the editor's top border.
 
-Spark reads config from `~/.pi/agent/spark.json` and from the current project’s `.pi/spark.json`. Project config overrides matching global fields.
+- Switch interactively with `/preset`, or jump straight to one with `/preset <name>`.
+- Start pi on a given preset with `pi --preset <name>`.
+- Cycle presets with `ctrl+super+p` (forward) and `ctrl+shift+super+p` (backward); `super` is `command` on macOS and needs a terminal that forwards it.
 
-All extensions are enabled by default. Set a specific extension to `false` to disable it, for example, `"footer": false` disables the footer extension.
+### Recap
 
-Example:
+pi-spark generates a short recap of the current session after it goes idle, or on demand, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
+
+- A recap is generated automatically once the session stays idle past `recap.idle` in `spark.json`.
+- Run `/recap` to generate one manually at any time.
+- The recap can use its own model, configured separately from your working model.
+
+### Agent tools: `name` and `model`
+
+pi-spark provides the pi coding agent with tools to inspect and manipulate itself. Currently, `name` and `model` tools are included.
+
+- `name` sets or updates the current session's name.
+- `model` shows the active model or lists pi models.
+
+## Configuration
+
+pi-spark reads config from `~/.pi/agent/spark.json` and from the current project's `.pi/spark.json`. Project config overrides matching global fields.
+
+For example:
 
 ```json
 {
-  "credits": false,
   "editor": {
     "spinner": "dots"
   },
@@ -67,58 +77,61 @@ Example:
 }
 ```
 
-### Credits
+### References
 
-- pi-spark shows the active provider's credit balance or rate-limit usage in the status line.
-- Supported providers: DeepSeek, Fireworks, Moonshot, OpenAI Codex, OpenRouter, and Vercel AI Gateway.
-- Most provider-specific fetching approaches reference [CodexBar](https://github.com/steipete/codexbar). Fireworks is an exception: its balance lives behind an internal gRPC API, so the approach was reverse-engineered from the `firectl` binary — see [docs/fireworks.md](./docs/fireworks.md).
+All fields are optional. Each top-level feature runs with the defaults below unless you [turn it off](#turn-off-the-features-you-dont-like).
 
-### Editor
+| Field | Value (or `false`) | Description |
+| --- | --- | --- |
+| `credits` | `{}` | Shows the active provider's credit balance or rate-limit usage in the status line. |
+| `editor` | `EditorConfig` | Shows a working indicator and the current model on the editor's top border. |
+| `footer` | `{}` | Shows session info, extension statuses, cost, and context usage on one line. |
+| `fullscreen` | `{}` | Clears the screen and scrollback on start and exit, and pins the editor and footer to the bottom. |
+| `model` | `{}` | Exposes the `model` agent tool. |
+| `name` | `{}` | Exposes the `name` agent tool. |
+| `presets` | `{ [name]: Preset }` | Defines named model presets, keyed by name. |
+| `recap` | `RecapConfig` | Generates a session recap when idle or on demand. |
 
-- `editor.spinner` controls the working indicator style and can be `dots`, `lights`, `tildes`, or `pulse`.
+#### `EditorConfig`
 
-### Footer
+The `spinner` field is optional and defaults to `tildes`.
 
-- pi-spark replaces the footer with a compact one-line view of session metadata, extension statuses, cost, and context usage.
+| Field | Value | Description |
+| --- | --- | --- |
+| `spinner` | `dots` | `⠋, ⠙, ⠹, ⠸, ⠼, ⠴, ⠦, ⠧, ⠇, ⠏` |
+|  | `lights` | `○, ●` |
+|  | `tildes` (default) | `∼, ≈, ≋, ≈, ∼` |
+|  | `pulse` | `·, •, ●, •, ·` |
 
-### Fullscreen
+#### `Preset`
 
-- pi-spark clears the screen and scrollback at session start and exit, pins the editor and footer to the bottom, and enables pi's `clearOnShrink` behavior programmatically so pinned UI stays aligned after taller components close.
+Each preset must set all three fields.
 
-### Models
+| Field | Value | Description |
+| --- | --- | --- |
+| `provider` | string | Provider id, e.g. `anthropic`. |
+| `model` | string | Model id, e.g. `claude-opus-4-8`. |
+| `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the preset. |
 
-- The agent can call the `model` tool with two actions:
-  - `active`: gets the active provider, model, and thinking level.
-  - `list`: lists models with their metadata, with an optional [Liqe](https://github.com/gajus/liqe) (Lucene-like) `query` over model fields and `offset`/`limit` paging.
+#### `RecapConfig`
 
-### Name
+All fields are optional, including `thinkingLevel`.
 
-- The agent can set or refresh the current session's name and optionally give a reason.
+| Field | Value | Description |
+| --- | --- | --- |
+| `idle` | number (ms) or duration string | How long the session must stay idle before a recap is generated. Accepts a millisecond number or a [vercel/ms](https://github.com/vercel/ms) string (e.g. `"3m"`); minimum 5000 ms, defaults to 3 minutes. |
+| `provider` | string | Provider id for the recap model. |
+| `model` | string | Model id for the recap model. |
+| `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the recap model. |
 
-### Presets
+### Turn off the features you don't like
 
-- Each key under `presets` defines a named model preset with `provider`, `model`, and optional `thinkingLevel` fields.
+All features are enabled by default. Set a specific feature to `false` in `spark.json` to disable it.
 
-Use presets in these ways:
-
-- Select interactively with `/preset` or `/preset <key>`
-- Start pi with a preset using `pi --preset <key>`
-- Cycle presets with `ctrl+super+p` and `ctrl+shift+super+p` (`super` is `command` on macOS)
-
-### Recap
-
-- pi-spark can generate a short recap after the session has been idle or when you run `/recap` manually.
-- The `recap.idle` value sets how long the session must stay idle before a recap is generated. It accepts either a millisecond number or a human-readable duration string parsed by [vercel/ms](https://github.com/vercel/ms) (e.g., `"3m"`, `"30s"`, `"2 minutes"`), and must resolve to at least 5000ms.
-- The recap model can be customized with `provider`, `model`, and `thinkingLevel`.
-
-## Recommended pi settings
-
-[Pi 0.79.0](https://pi.dev/news/releases/0.79.0) added a project trust dialog that asks before loading project-local resources ([earendil-works/pi#5514](https://github.com/earendil-works/pi/issues/5514)), and [pi 0.79.1](https://pi.dev/news/releases/0.79.1) made the default behavior configurable via `defaultProjectTrust`. To keep startup minimal, set it to `"always"` in `~/.pi/agent/settings.json` (or change it with `/settings`):
+For example, to disable the customized footer:
 
 ```json
 {
-  "defaultProjectTrust": "always"
+  "footer": false
 }
 ```
-
-Project trust is an [input-loading guard](https://pi.dev/docs/latest/security#project-trust), so use `"always"` only if you trust the projects you open.

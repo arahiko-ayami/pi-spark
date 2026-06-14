@@ -13,14 +13,15 @@
   "license": "MIT",
   "type": "module",
   "files": [
-    "extensions",
+    "index.ts",
+    "src",
     "assets",
     "README.md",
     "LICENSE"
   ],
   "pi": {
     "extensions": [
-      "./extensions"
+      "./index.ts"
     ],
     "image": "https://raw.githubusercontent.com/zlliang/pi-spark/main/assets/cover.png"
   },
