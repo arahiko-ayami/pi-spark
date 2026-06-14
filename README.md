@@ -4,6 +4,8 @@
 
 [Pi](https://pi.dev/) package that polishes your daily experience and keeps you at the frontier of agentic workflows.
 
+![Overview](./assets/screenshot-overview.png)
+
 ## Features
 
 ### Compact TUI: editor, footer, and fullscreen
@@ -14,12 +16,16 @@ pi-spark ships with custom editor, footer, and fullscreen rendering, replacing t
 - The footer shows session information, extension statuses, cost, and context usage on one line.
 - The fullscreen rendering clears the terminal screen and scrollback on session start and exit, and pins the editor and footer to the bottom.
 
+![Compact TUI](./assets/screenshot-tui.png)
+
 ### Credits
 
 pi-spark shows the active provider's credit balance or rate-limit usage in the status line, so you can keep an eye on what's left without leaving the terminal.
 
 - Supported providers: DeepSeek, Fireworks, Moonshot, OpenAI Codex, OpenRouter, and Vercel AI Gateway.
 - Most provider fetching follows [CodexBar](https://github.com/steipete/codexbar). Fireworks is the exception: its balance sits behind an internal gRPC API, reverse-engineered from the `firectl` binary (see [docs/fireworks.md](./docs/fireworks.md)).
+
+![Credits](./assets/screenshot-credits.png)
 
 ### Presets
 
@@ -29,6 +35,8 @@ pi-spark lets you define named model presets in `spark.json` (see [Configuration
 - Start pi on a given preset with `pi --preset <name>`.
 - Cycle presets with `ctrl+super+p` (forward) and `ctrl+shift+super+p` (backward); `super` is `command` on macOS and needs a terminal that forwards it.
 
+![Presets](./assets/screenshot-presets.png)
+
 ### Recap
 
 pi-spark generates a short recap of the current session after it goes idle, or on demand, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
@@ -37,12 +45,16 @@ pi-spark generates a short recap of the current session after it goes idle, or o
 - Run `/recap` to generate one manually at any time.
 - The recap can use its own model, configured separately from your working model.
 
+![Recap](./assets/screenshot-recap.png)
+
 ### Agent tools: `name` and `model`
 
 pi-spark provides the pi coding agent with tools to inspect and manipulate itself. Currently, `name` and `model` tools are included.
 
 - `name` sets or updates the current session's name.
 - `model` shows the active model or lists pi models.
+
+![Agent tools](./assets/screenshot-tools.png)
 
 ## Configuration
 
