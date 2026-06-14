@@ -31,15 +31,14 @@ export const whoamiAction = defineAction({
       return container;
     }
 
-    const sessionName = details.sessionName ?? theme.fg("dim", "(unnamed)");
-    container.addChild(new Text(`${theme.fg("muted", "session")}  ${theme.fg("accent", sessionName)}`, 0, 0));
+    if (details.sessionName) {
+      container.addChild(new Text(theme.fg("muted", `session  ${details.sessionName}`), 0, 0));
+    }
 
     if (details.model) {
       const row = toModelRow(details.model, details.thinkingLevel);
       const cells = [row.label, row.cost, row.context].join("  ");
-      container.addChild(new Text(`${theme.fg("muted", "model")}    ${theme.fg("muted", cells)}`, 0, 0));
-    } else {
-      container.addChild(new Text(`${theme.fg("muted", "model")}    ${theme.fg("dim", "(no-model)")}`, 0, 0));
+      container.addChild(new Text(theme.fg("muted", `model    ${cells}`), 0, 0));
     }
 
     return container;

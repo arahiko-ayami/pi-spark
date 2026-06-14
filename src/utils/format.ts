@@ -4,7 +4,7 @@ import type { ImageContent, Provider, TextContent } from "@earendil-works/pi-ai"
 import type { ContextUsage } from "@earendil-works/pi-coding-agent";
 
 export function formatModel(provider?: Provider, model?: string, thinkingLevel?: string): string {
-  return provider && model ? `${provider}/${model}${thinkingLevel ? `:${thinkingLevel}` : ""}` : "(no-model)";
+  return provider && model ? `${provider}/${model}${thinkingLevel ? `:${thinkingLevel}` : ""}` : "no-model";
 }
 
 export function formatTokens(count: number): string {
