@@ -6,6 +6,20 @@
 
 ![Overview](./assets/screenshot-overview.png)
 
+## Install
+
+Install from npm:
+
+```bash
+pi install npm:pi-spark
+```
+
+Install from git:
+
+```bash
+pi install git:github.com/zlliang/pi-spark
+```
+
 ## Features
 
 ### Compact TUI: editor, footer, and fullscreen
