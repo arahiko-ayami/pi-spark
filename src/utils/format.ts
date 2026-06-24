@@ -1,9 +1,9 @@
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
-import type { Provider } from "@earendil-works/pi-ai";
+import type { ProviderId } from "@earendil-works/pi-ai";
 import type { ContextUsage } from "@earendil-works/pi-coding-agent";
 
-export function formatModel(provider?: Provider, model?: string, thinkingLevel?: string): string {
+export function formatModel(provider?: ProviderId, model?: string, thinkingLevel?: string): string {
   return provider && model ? `${provider}/${model}${thinkingLevel ? `:${thinkingLevel}` : ""}` : "no-model";
 }
 

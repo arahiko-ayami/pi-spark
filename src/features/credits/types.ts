@@ -1,4 +1,4 @@
-import type { Provider } from "@earendil-works/pi-ai";
+import type { ProviderId } from "@earendil-works/pi-ai";
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 /**
@@ -18,7 +18,7 @@ export interface CreditsLane {
 
 /** A credits source for a Pi provider, shown in the status line while that provider is active. */
 export interface CreditsProvider {
-  readonly id: Provider;
+  readonly id: ProviderId;
   readonly label: string;
   fetch(ctx: ExtensionContext, apiKey: string, signal: AbortSignal): Promise<Credits>;
 }
