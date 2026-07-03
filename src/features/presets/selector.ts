@@ -20,7 +20,7 @@ export async function showPresetSelector(ctx: ExtensionContext, presetManager: P
       }));
 
     const container = new Container();
-    container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+    container.addChild(new DynamicBorder((s: string) => theme.fg("border", s)));
 
     const box = new Box(1, 1);
     box.addChild(new Text(theme.bold(theme.fg("accent", "Select preset")), 0, 0));
@@ -46,7 +46,7 @@ export async function showPresetSelector(ctx: ExtensionContext, presetManager: P
     box.addChild(new Text(keyHints.join("  "), 0, 0));
 
     container.addChild(box);
-    container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+    container.addChild(new DynamicBorder((s: string) => theme.fg("border", s)));
 
     return {
       render: (width: number) => container.render(width),
