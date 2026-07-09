@@ -55,14 +55,14 @@ export default function (pi: ExtensionAPI) {
 
 Prompt tokens from an empty cwd. Default built-in tools = `read, bash, edit, write` (4; `grep, find, ls` exist but are off by default).
 
-| Model | System prompt | Built-in tools | Built-in total | `pi` tool | `web` tool |
-| --- | --- | --- | --- | --- | --- |
-| Claude Opus 4.8 | 615 | 1561 | 2176 | 1012 | 479 |
-| GPT-5.5 | 386 | 737 | 1123 | 647 | 305 |
-| DeepSeek V4 Flash | 406 | 1107 | 1513 | 697 | 341 |
-| Kimi K2.6 | 397 | 708 | 1105 | 617 | 272 |
-| **Average** | **~450** | **~1030** | **~1480** | **~743** | **~349** |
+| Model | System prompt | Built-in tools | Built-in total |
+| --- | --- | --- | --- |
+| Claude Opus 4.8 | 615 | 1561 | 2176 |
+| GPT-5.5 | 386 | 737 | 1123 |
+| DeepSeek V4 Flash | 406 | 1107 | 1513 |
+| Kimi K2.6 | 397 | 708 | 1105 |
+| **Average** | **~450** | **~1030** | **~1480** |
 
-Rules of thumb: system prompt **~450**, the 4 default built-in tools **~1030** (**~260/tool**); pi-spark's `pi` tool **~743**, `web` tool **~349**. Anthropic counts ~1.5–2× the others, so budget per-provider.
+Rules of thumb: system prompt **~450**, the 4 default built-in tools **~1030** (**~260/tool**). Anthropic counts ~1.5–2× the others, so budget per-provider.
 
 Last measured: pi 0.79.3, 2026-06-14.
